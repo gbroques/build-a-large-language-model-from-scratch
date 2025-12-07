@@ -222,17 +222,15 @@ Video: [https://www.youtube.com/watch?v=z9fgKz1Drlc&list=PLPTV0NXA_ZSgsLAr8YCgCw
 
 ### Stage 1: Architecture and Fundamentals
 
-**Data Preparation & Sampling**
-- **Tokenization** - breaking down text into units
-- **Embeddings** - capture semantic meaning of units
-- **Batching** - how to handle a large amount of data. What is "context"?
-  - [How GPT3 Works - Visualizations and Animations](https://jalammar.github.io/how-gpt3-works-visualizations-animations/)
-
-**Attention Mechanism**
-- Multi-head attention
-- Masked multi-head attention
-
-**LLM Architecture**
+1. **Data Preparation & Sampling**
+  - **Tokenization** - breaking down text into units
+  - **Embeddings** - capture semantic meaning of units
+  - **Batching** - how to handle a large amount of data. What is "context"?
+    - [How GPT3 Works - Visualizations and Animations](https://jalammar.github.io/how-gpt3-works-visualizations-animations/)
+2. **Attention Mechanism**
+  - Multi-head attention
+  - Masked multi-head attention
+3. **LLM Architecture**
 
 ### Stage 2: Pretraining
 
