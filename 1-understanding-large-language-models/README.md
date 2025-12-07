@@ -262,7 +262,3 @@ Question?<|end|>
 
 **Alpaca prompt style template**
 
-## Code an LLM Tokenizer from Scratch in Python
-
-Video: [https://www.youtube.com/watch?v=rsy5Ragmso8&list=PLPTV0NXA_ZSgsLAr8YCgCwhPIJNNtexWu&index=7](https://www.youtube.com/watch?v=rsy5Ragmso8&list=PLPTV0NXA_ZSgsLAr8YCgCwhPIJNNtexWu&index=7)
-
