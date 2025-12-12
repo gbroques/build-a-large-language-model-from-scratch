@@ -16,3 +16,4 @@ pip install -r requirements.txt
 ```
 
 * [Chapter 1: Understanding large language models](./1-understanding-large-language-models/README.md)
+* [Chapter 2: Working with text data](./2-working-with-text-data/README.md)
