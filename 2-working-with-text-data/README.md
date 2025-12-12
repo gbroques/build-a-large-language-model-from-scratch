@@ -69,3 +69,20 @@ BPE builds its vocabulary by iteratively merging frequent characters into subwor
 
 ![stride parameter](./2-14-stride-parameter.png)
 
+## Positional Embeddings
+
+Token embeddings and the self-attention mechanism are position agnostic.
+
+There are two broad categories of position-aware embeddings:
+
+1. *relative* positional embeddings
+2. *absolute* positional embeddings
+
+Absolute positional embeddings are directly associated with specific positions in a sequence (i.e. the first token will always have the same positional embedding added to its token embedding).
+
+Positional embeddings are added to the token embeddings to produce *input embeddings*.
+
+Relative positional embeddings focuses on the relative distance between tokens so the model learns "how far apart" rather than "at which exact position". The advantage is that the model can generalize better to sequences of varying length, even those not seen during training.
+
+Open AI's GPT models use absolute positional embeddings optimized during the training process.
+
