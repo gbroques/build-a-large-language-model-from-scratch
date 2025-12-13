@@ -94,3 +94,11 @@ Applying the dropout mask after computing the attention weights is more common.
 
 ![dropout](./3-22-dropout.png)
 
+### Multi-head Attention
+
+"Multi-head" attention refers to dividing the attention mechanism into multiple "heads," operating in parallel. A single masked attention module can be considered single-head attention, where there is only one set of attention weights processing the input sequentially.
+
+Each head produces a set of context vectors which are then concatenated into a final matrix.
+
+Multiple attention heads is crucial for complex pattern recognition at the cost of computational expense.
+
