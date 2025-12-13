@@ -54,9 +54,28 @@ A context vector can be interpreted as an enriched embedding vector.
 
 A dot product measures the similarity of two vectors. In the context of self-attention mechanisms, the dot product determines the extent to which each element in a sequence "attends to" any other element: the higher the dot product, the higher the similarity and attention score between them.
 
-Computing a dot product requires summing the element-wise multiplication for two vectors.
+Computing a dot product requires summing the element-wise [product](https://en.wikipedia.org/wiki/Product_(mathematics)) for two vectors.
 
 Next, the attention scores are normalized via a `softmax` function to obtain attention weights that sum up to 1 which is useful for interpretation and maintaining training stability in an LLM.
 
-The softmax function ensures that the attention weights are always positive, avoids extreme values and offers more favorable gradient properties during training.
+The `softmax` function ensures that the attention weights are always positive, avoids extreme values, and offers more favorable gradient properties during training.
+
+### Self-attention with trainable weights
+
+Next is implementing the self-attention mechanism with trainable weights from the "Attention Is All You Need" paper known as [scaled dot-product attention](https://en.wikipedia.org/wiki/Attention_(machine_learning)#Standard_scaled_dot-product_attention).
+
+We will introduce three trainable weight matrices Wq, Wk, and Wv, to project the embedded input tokens, x(i), into query, key, and value vectors, respectively.
+
+The terms "key," "query," and "value" are borrowed from the domain of information retrieval and databases, where similar concepts are used to store, search, and retrieve information.
+
+A *query* is analogous to a search query in a database. It represents the current item (e.g., a word or token in a sentence) the model focuses on or tries to understand. The query is used to probe the other parts of the input sequence to determine how much attention to pay to them.
+
+The *key* is like a database key used for indexing and searching. In the attention mechanism, each item in the input sequence (e.g., each word in a sentence) has an associated key. These keys are used to match the query.
+
+The *value* in this context is similar to the value in a key-value pair in a database. It represents the actual content or representation of the input items. Once the model determines which keys (and thus which parts of the input) are most relevant to the query (the current focus item), it retrieves the corresponding values.
+
+The attention score computation is a dot-product computation similar to the simplified self-attention mechanism. The new aspect here is that we are not directly computing the dot-product between the input elements, but using the query and key obtained by transforming the inputs via the respective weight matrices.
+
+The reason for the normalization by the embedding dimension size is to improve the training performance by avoiding small gradients near zero. These small gradients can drastically slow down learning or cause training to stagnate.
+
 
