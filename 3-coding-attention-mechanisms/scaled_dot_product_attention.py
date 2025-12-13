@@ -3,8 +3,6 @@ import torch.nn as nn
 from typing import List, Optional
 
 
-
-
 def print_section_header(title: str, shape: torch.Size) -> None:
     """Print formatted section header with title and shape."""
     heading = f"{title} {tuple(shape)}"

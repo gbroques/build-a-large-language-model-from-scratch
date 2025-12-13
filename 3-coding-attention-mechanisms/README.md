@@ -78,4 +78,19 @@ The attention score computation is a dot-product computation similar to the simp
 
 The reason for the normalization by the embedding dimension size is to improve the training performance by avoiding small gradients near zero. These small gradients can drastically slow down learning or cause training to stagnate.
 
+### Masked Attention
+
+[Masked attention](https://en.wikipedia.org/wiki/Attention_(machine_learning)#Masked_attention), also known as causal attention, is a form of self-attention that only considers previous and current tokens in the sequence when computing attention scores.
+
+![masked attention](./3-19-masked-attention.png)
+
+*Dropout* is a deep learning technique where randomly selected hidden layer units are ignored during training, effectively "dropping" them out to help prevent overfitting.
+
+In the transformer architecture, including models like GPT, dropout in the attention mechanism is typically applied at two specific times:
+1. after calculating the attention weights
+2. or after applying the attention weights to the value vectors.
+
+Applying the dropout mask after computing the attention weights is more common.
+
+![dropout](./3-22-dropout.png)
 
