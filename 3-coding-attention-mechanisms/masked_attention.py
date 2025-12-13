@@ -1,5 +1,6 @@
 from torch import nn
 import torch
+from print_utils import print_section
 
 
 class CausalAttention(nn.Module):
@@ -15,19 +16,61 @@ class CausalAttention(nn.Module):
             "mask", torch.triu(torch.ones(context_length, context_length), diagonal=1)
         )
 
+        tokens = ["Your", "journey", "starts", "with", "one", "step"]
+        print_section("2.1 Query Weight Matrix", self.W_query.weight, ["dim0", "dim1"])
+        print_section("2.2 Key Weight Matrix", self.W_key.weight, ["dim0", "dim1"])
+        print_section("2.3 Value Weight Matrix", self.W_value.weight, ["dim0", "dim1"])
+        print_section("2.4 Causal Mask", self.mask, tokens, tokens)
+
     def forward(self, x):
         b, num_tokens, d_in = x.shape
+        tokens = ["Your", "journey", "starts", "with", "one", "step"]
+
         keys = self.W_key(x)
         queries = self.W_query(x)
         values = self.W_value(x)
 
+        print_section("3.1 Queries (Batch 0)", queries[0], tokens)
+        print_section("3.2 Keys (Batch 0)", keys[0], tokens)
+        print_section("3.3 Values (Batch 0)", values[0], tokens)
+
         attn_scores = queries @ keys.transpose(1, 2)
+        print_section(
+            "4. Attention Scores (Batch 0)",
+            attn_scores[0],
+            tokens,
+            tokens,
+            calculation=f"Q @ Kt = {tuple(queries.shape)} @ {tuple(keys.transpose(1, 2).shape)}",
+        )
+
         attn_scores.masked_fill_(self.mask.bool()[:num_tokens, :num_tokens], -torch.inf)
+        print_section(
+            "5. Masked Attention Scores (Batch 0)",
+            attn_scores[0],
+            tokens,
+            tokens,
+            calculation="Apply causal mask (set future positions to -inf)",
+        )
+
         attn_weights = torch.softmax(attn_scores / keys.shape[-1] ** 0.5, dim=-1)
         attn_weights = self.dropout(attn_weights)
-        print(attn_weights)
+        print_section(
+            "6. Attention Weights (Batch 0)",
+            attn_weights[0],
+            tokens,
+            tokens,
+            calculation=f"softmax(Masked Scores / sqrt({keys.shape[-1]}))",
+        )
 
         context_vec = attn_weights @ values
+        print_section(
+            "7. Context Vectors (Batch 0)",
+            context_vec[0],
+            tokens,
+            ["dim0", "dim1"],
+            calculation=f"Attention Weights @ Values = {tuple(attn_weights.shape)} @ {tuple(values.shape)}",
+        )
+
         return context_vec
 
 
@@ -43,9 +86,10 @@ inputs = torch.tensor(
     ]  # step     (x^6)
 )
 
+tokens = ["Your", "journey", "starts", "with", "one", "step"]
 
 batch = torch.stack((inputs, inputs), dim=0)
-print(batch.shape)
+print_section("1. Input Embeddings (Batch 0)", inputs, tokens)
 
 torch.manual_seed(123)
 context_length = batch.shape[1]
@@ -53,5 +97,11 @@ d_in = inputs.shape[1]
 d_out = 2
 ca = CausalAttention(d_in, d_out, context_length, 0.0)
 context_vecs = ca(batch)
-print("context_vecs.shape:", context_vecs.shape)
-print(context_vecs)
+batch_labels = [f"B0-{token}" for token in tokens] + [f"B1-{token}" for token in tokens]
+print_section(
+    "8. Final Context Vectors (All Batches)",
+    context_vecs.view(-1, d_out),
+    batch_labels,
+    ["dim0", "dim1"],
+    calculation=f"Output shape: {context_vecs.shape} -> reshaped for display",
+)
