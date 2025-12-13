@@ -1,5 +1,44 @@
 import torch
+from typing import List, Optional, Tuple
 
+# Formatting constants
+LABEL_WIDTH = 8
+DECIMAL_PLACES = 3
+
+
+def print_section_header(title: str, shape: torch.Size) -> None:
+    """Print formatted section header with title and shape."""
+    heading = f"{title} {tuple(shape)}"
+    print(heading)
+    print("-" * len(heading))
+
+
+def print_section(
+    title: str,
+    data: torch.Tensor,
+    row_labels: List[str],
+    col_labels: Optional[List[str]] = None,
+) -> None:
+    """Print formatted tensor data with row and optional column labels."""
+    print_section_header(title, data.shape)
+    if col_labels:
+        print(
+            " " * LABEL_WIDTH,
+            " ".join(f"{label:>{LABEL_WIDTH}}" for label in col_labels),
+        )
+    for i, row_label in enumerate(row_labels):
+        print(
+            f"{row_label:>{LABEL_WIDTH}}",
+            " ".join(
+                f"{data[i][j]:{LABEL_WIDTH}.{DECIMAL_PLACES}f}"
+                for j in range(data.shape[1])
+            ),
+        )
+    print()
+
+
+# 6 tokens, with an embedding dimension of 3.
+tokens = ["Your", "journey", "starts", "with", "one", "step"]
 inputs = torch.tensor(
     [
         [0.43, 0.15, 0.89],  # Your     (x^1)
@@ -11,43 +50,24 @@ inputs = torch.tensor(
     ]  # step     (x^6)
 )
 
-query = inputs[1]
-attention_scores_2 = torch.empty(inputs.shape[0])
-for i, x_i in enumerate(inputs):
-    attention_scores_2[i] = torch.dot(x_i, query)
-print(attention_scores_2)
+print_section("Token Embeddings", inputs, tokens)
 
-attn_weights_2_norm = attention_scores_2 / attention_scores_2.sum()
-print("Attention weights:", attn_weights_2_norm)
-print("Sum:", attn_weights_2_norm.sum())
+# Compute the dot product between all elements to determine which elements "attend to" each other.
+# The higher the dot product, the higher the similarity and attention score between two elements.
+#
+# Shape: 6x3 @ 3x6 = 6x6
+#
+# attention_scores[i][j] represents how much token i attends to token j.
+#
+# For example:
+# - attention_scores[0][2] = how much "Your" (token 0) attends to "starts" (token 2)
+# - attention_scores[3][1] = how much "with" (token 3) attends to "journey" (token 1)
+#
+# The diagonal elements attention_scores[i][i] represent how much each token attends to itself.
+#
+attention_scores = inputs @ inputs.T
+print_section("Attention Scores", attention_scores, tokens, tokens)
 
-
-def softmax_naive(x):
-    """
-    Note that this naive softmax implementation (softmax_naive) may encounter numerical instability problems, such as overflow and underflow, when dealing with large or small input values. Therefore, in practice, it’s advisable to use the PyTorch implementation of softmax, which has been extensively optimized for performance.
-    """
-    return torch.exp(x) / torch.exp(x).sum(dim=0)
-
-
-attn_weights_2_naive = softmax_naive(attention_scores_2)
-print("Attention weights:", attn_weights_2_naive)
-print("Sum:", attn_weights_2_naive.sum())
-
-attn_weights_2 = torch.softmax(attention_scores_2, dim=0)
-print("Attention weights:", attn_weights_2)
-print("Sum:", attn_weights_2.sum())
-
-query = inputs[1]
-context_vec_2 = torch.zeros(query.shape)
-for i, x_i in enumerate(inputs):
-    context_vec_2 += attn_weights_2[i] * x_i
-print(context_vec_2)
-
-attn_scores = torch.empty(6, 6)
-for i, x_i in enumerate(inputs):
-    for j, x_j in enumerate(inputs):
-        attn_scores[i, j] = torch.dot(x_i, x_j)
-print(attn_scores)
-
-attn_scores = inputs @ inputs.T
-print(attn_scores)
+# Set dim=-1 normalize across the columns so that the values in each row sum up to 1
+attention_weights = torch.softmax(attention_scores, dim=-1)
+print_section("Attention Weights", attention_weights, tokens, tokens)
