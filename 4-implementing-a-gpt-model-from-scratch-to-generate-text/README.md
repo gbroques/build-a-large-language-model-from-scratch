@@ -55,3 +55,14 @@ Internally, the model expands the embedding dimension by a factor of 4 (arbitrar
 
 The uniformity in input and output layers simplifies the architecture and lends itself to stacking of multiple layers and scalability.
 
+## Adding shortcut connections
+
+Shortcut connections, also known as skip or residual connections, improve training performance.
+
+Originally proposed for deep networks in computer vision to mitigate vanishing gradients. Vanishing gradients refers to when gradients, which guide weight updates during training, become progressively smaller as they propagate backward through the layers making it difficult to train eariler layers.
+
+Shortcut connections involve adding the output of one layer to the the output of a later layer effectively creating an alternate path bypassing certain layers as seen below:
+
+![shortcut connections](./4-12-shortcut-connections.png)
+
+See [Residual Networks and Skip Connections (DL 15)](https://www.youtube.com/watch?v=Q1JCrG1bJ-A) for more information.
