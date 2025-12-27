@@ -141,8 +141,45 @@ print("Token embedding layer shape:", model.tok_emb.weight.shape)
 print("Output layer shape:", model.out_head.weight.shape)
 total_params_gpt2 = total_params - sum(p.numel() for p in model.out_head.parameters())
 print(f"Number of trainable parameters considering weight tying: {total_params_gpt2:,}")
-print("Weight tying reduces memory and computational requirements at the expense of training and model performance.")
+print(
+    "Weight tying reduces memory and computational requirements at the expense of training and model performance."
+)
 # Assume each parameter is a 32-bit float requiring 4 bytes
 total_size_bytes = total_params * 4
 total_size_mb = total_size_bytes / (1024 * 1024)
 print(f"Total size of the model: {total_size_mb:.2f} MB")
+
+
+def generate_text_simple(model, idx, max_new_tokens, context_size):
+    for _ in range(max_new_tokens):
+        idx_cond = idx[:, -context_size:]
+        with torch.no_grad():
+            logits = model(idx_cond)
+
+        logits = logits[:, -1, :]
+        # softmax is monotonic, meaning it preserves the order of its inputs when transformed into outputs
+        probas = torch.softmax(logits, dim=-1)
+        # always generating the most likely next token is known as greedy decoding
+        idx_next = torch.argmax(probas, dim=-1, keepdim=True)
+        idx = torch.cat((idx, idx_next), dim=1)
+
+    return idx
+
+
+start_context = "Hello, I am"
+encoded = tokenizer.encode(start_context)
+print("encoded:", encoded)
+encoded_tensor = torch.tensor(encoded).unsqueeze(0)
+print("encoded_tensor.shape:", encoded_tensor.shape)
+model.eval()
+out = generate_text_simple(
+    model=model,
+    idx=encoded_tensor,
+    max_new_tokens=6,
+    context_size=GPT_CONFIG_124M["context_length"],
+)
+print("Output:", out)
+print("Output length:", len(out[0]))
+decoded_text = tokenizer.decode(out.squeeze(0).tolist())
+print("\nThe untrained model outputs gibberish:")
+print(decoded_text)
