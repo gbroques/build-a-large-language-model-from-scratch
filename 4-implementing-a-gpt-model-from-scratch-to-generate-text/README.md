@@ -66,3 +66,13 @@ Shortcut connections involve adding the output of one layer to the the output of
 ![shortcut connections](./4-12-shortcut-connections.png)
 
 See [Residual Networks and Skip Connections (DL 15)](https://www.youtube.com/watch?v=Q1JCrG1bJ-A) for more information.
+
+## Connecting attention and linear layers in a transformer block
+
+The transformer block is repeated 12 times in the GPT-2 architecture and combines multi-head attention, layer normalization, dropout, feed forward layers, and GELU activations.
+
+The operations within the transformer block, including multi-head attention and feed forward layers, are designed to transform token embedding vectors in a way that preserves their dimensionality.
+
+The idea is that the self-attention mechanism in the multi-head attention block identifies and analyzes relationships between elements in the input sequence, while the feed forward network modifies data individually at each position. This combination enables a more nuanced understanding of the input and enhances the model's overall capacity for complex patterns.
+
+Layer normalization is applied before multi-head attention and the feedforward network, and dropout is applied after them to regularize the model and prevent overfitting. This is known as Pre-LayerNorm. Older architectures, such as the original transformer model, applied layer normalization after self-attention and the feed forward network, known as Post-LayerNorm, which often lead to worse training dynamics.
